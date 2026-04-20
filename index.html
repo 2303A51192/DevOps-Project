@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Library Book Search System</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">📚</span>
+        <div>
+          <h1>LibraSearch</h1>
+          <p class="tagline">Intelligent Library Management</p>
+        </div>
+      </div>
+      <nav class="nav-tabs">
+        <button class="tab-btn active" data-tab="search">🔍 Search Books</button>
+        <button class="tab-btn" data-tab="add">➕ Add Book</button>
+        <button class="tab-btn" data-tab="catalog">📋 Full Catalog</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+
+    <!-- ===== TAB 1: SEARCH ===== -->
+    <section id="tab-search" class="tab-panel active">
+      <div class="section-hero">
+        <h2>Find Your Next Read</h2>
+        <p>Search by title, author, genre, or ISBN</p>
+      </div>
+
+      <div class="search-card">
+        <div class="search-row">
+          <div class="input-wrap search-input-wrap">
+            <span class="input-icon">🔍</span>
+            <input type="text" id="searchQuery" placeholder="Search books..." autocomplete="off"/>
+            <span id="searchError" class="field-error"></span>
+          </div>
+          <div class="input-wrap">
+            <select id="searchField">
+              <option value="all">All Fields</option>
+              <option value="title">Title</option>
+              <option value="author">Author</option>
+              <option value="genre">Genre</option>
+              <option value="isbn">ISBN</option>
+            </select>
+          </div>
+          <div class="input-wrap">
+            <select id="sortField">
+              <option value="title">Sort: Title</option>
+              <option value="author">Sort: Author</option>
+              <option value="year">Sort: Year</option>
+              <option value="genre">Sort: Genre</option>
+            </select>
+          </div>
+          <div class="input-wrap">
+            <select id="sortOrder">
+              <option value="asc">↑ Ascending</option>
+              <option value="desc">↓ Descending</option>
+            </select>
+          </div>
+          <button class="btn-primary" id="searchBtn">Search</button>
+          <button class="btn-ghost" id="clearBtn">Clear</button>
+        </div>
+        <div id="searchStatus" class="search-status"></div>
+      </div>
+
+      <!-- Results Table -->
+      <div class="table-card">
+        <div class="table-header-row">
+          <h3>Search Results <span id="resultCount" class="badge">0 books</span></h3>
+          <button class="btn-ghost btn-sm" id="exportBtn">⬇ Export CSV</button>
+        </div>
+        <div class="table-wrapper">
+          <table id="bookTable">
+            <thead>
+              <tr>
+                <th data-sort="id">#</th>
+                <th data-sort="title">Title ↕</th>
+                <th data-sort="author">Author ↕</th>
+                <th data-sort="genre">Genre</th>
+                <th data-sort="year">Year ↕</th>
+                <th data-sort="isbn">ISBN</th>
+                <th data-sort="status">Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="bookTableBody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+        <div id="noResults" class="no-results hidden">
+          <span>📭</span>
+          <p>No books found. Try a different search.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== TAB 2: ADD BOOK ===== -->
+    <section id="tab-add" class="tab-panel">
+      <div class="section-hero">
+        <h2>Add New Book</h2>
+        <p>Fill in the details below to add a book to the catalog</p>
+      </div>
+
+      <div class="form-card">
+        <form id="bookForm" novalidate>
+
+          <div class="form-grid">
+
+            <div class="form-group">
+              <label for="bookTitle">Book Title <span class="req">*</span></label>
+              <input type="text" id="bookTitle" name="title" placeholder="e.g. To Kill a Mockingbird" maxlength="150"/>
+              <span class="field-error" id="titleError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="bookAuthor">Author <span class="req">*</span></label>
+              <input type="text" id="bookAuthor" name="author" placeholder="e.g. Harper Lee" maxlength="100"/>
+              <span class="field-error" id="authorError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="bookISBN">ISBN <span class="req">*</span></label>
+              <input type="text" id="bookISBN" name="isbn" placeholder="13-digit ISBN e.g. 9780061743528" maxlength="13"/>
+              <span class="field-error" id="isbnError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="bookGenre">Genre <span class="req">*</span></label>
+              <select id="bookGenre" name="genre">
+                <option value="">-- Select Genre --</option>
+                <option>Fiction</option>
+                <option>Non-Fiction</option>
+                <option>Science Fiction</option>
+                <option>Fantasy</option>
+                <option>Mystery</option>
+                <option>Biography</option>
+                <option>History</option>
+                <option>Science</option>
+                <option>Technology</option>
+                <option>Self-Help</option>
+                <option>Children</option>
+                <option>Poetry</option>
+              </select>
+              <span class="field-error" id="genreError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="bookYear">Publication Year <span class="req">*</span></label>
+              <input type="number" id="bookYear" name="year" placeholder="e.g. 1960" min="1000" max="2025"/>
+              <span class="field-error" id="yearError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="bookPages">Number of Pages</label>
+              <input type="number" id="bookPages" name="pages" placeholder="e.g. 320" min="1" max="9999"/>
+              <span class="field-error" id="pagesError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="bookPublisher">Publisher</label>
+              <input type="text" id="bookPublisher" name="publisher" placeholder="e.g. HarperCollins" maxlength="100"/>
+            </div>
+
+            <div class="form-group">
+              <label for="bookStatus">Availability Status <span class="req">*</span></label>
+              <select id="bookStatus" name="status">
+                <option value="">-- Select Status --</option>
+                <option value="available">Available</option>
+                <option value="borrowed">Borrowed</option>
+                <option value="reserved">Reserved</option>
+                <option value="lost">Lost</option>
+              </select>
+              <span class="field-error" id="statusError"></span>
+            </div>
+
+            <div class="form-group full-width">
+              <label for="bookDescription">Description / Notes</label>
+              <textarea id="bookDescription" name="description" placeholder="Brief synopsis or notes..." maxlength="500" rows="3"></textarea>
+              <small id="descCount">0 / 500</small>
+            </div>
+
+          </div><!-- end form-grid -->
+
+          <div class="form-actions">
+            <button type="submit" class="btn-primary" id="submitBtn">➕ Add Book</button>
+            <button type="reset" class="btn-ghost" id="resetFormBtn">↺ Reset</button>
+          </div>
+
+          <div id="formMessage" class="form-message hidden"></div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ===== TAB 3: FULL CATALOG ===== -->
+    <section id="tab-catalog" class="tab-panel">
+      <div class="section-hero">
+        <h2>Full Catalog</h2>
+        <p>All books in the system</p>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card"><span id="statTotal">0</span><label>Total Books</label></div>
+        <div class="stat-card available"><span id="statAvail">0</span><label>Available</label></div>
+        <div class="stat-card borrowed"><span id="statBorrow">0</span><label>Borrowed</label></div>
+        <div class="stat-card reserved"><span id="statReserved">0</span><label>Reserved</label></div>
+      </div>
+      <div class="table-card">
+        <div class="table-wrapper">
+          <table id="catalogTable">
+            <thead>
+              <tr>
+                <th>#</th><th>Title</th><th>Author</th><th>Genre</th>
+                <th>Year</th><th>ISBN</th><th>Pages</th><th>Status</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="catalogTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- EDIT MODAL -->
+  <div id="editModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>✏️ Edit Book</h3>
+        <button id="closeModal" class="close-btn">✕</button>
+      </div>
+      <form id="editForm" novalidate>
+        <input type="hidden" id="editId"/>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Title <span class="req">*</span></label>
+            <input type="text" id="editTitle" maxlength="150"/>
+            <span class="field-error" id="editTitleError"></span>
+          </div>
+          <div class="form-group">
+            <label>Author <span class="req">*</span></label>
+            <input type="text" id="editAuthor" maxlength="100"/>
+            <span class="field-error" id="editAuthorError"></span>
+          </div>
+          <div class="form-group">
+            <label>ISBN <span class="req">*</span></label>
+            <input type="text" id="editISBN" maxlength="13"/>
+            <span class="field-error" id="editIsbnError"></span>
+          </div>
+          <div class="form-group">
+            <label>Genre <span class="req">*</span></label>
+            <select id="editGenre">
+              <option value="">-- Select --</option>
+              <option>Fiction</option><option>Non-Fiction</option>
+              <option>Science Fiction</option><option>Fantasy</option>
+              <option>Mystery</option><option>Biography</option>
+              <option>History</option><option>Science</option>
+              <option>Technology</option><option>Self-Help</option>
+              <option>Children</option><option>Poetry</option>
+            </select>
+            <span class="field-error" id="editGenreError"></span>
+          </div>
+          <div class="form-group">
+            <label>Year <span class="req">*</span></label>
+            <input type="number" id="editYear" min="1000" max="2025"/>
+            <span class="field-error" id="editYearError"></span>
+          </div>
+          <div class="form-group">
+            <label>Status <span class="req">*</span></label>
+            <select id="editStatus">
+              <option value="available">Available</option>
+              <option value="borrowed">Borrowed</option>
+              <option value="reserved">Reserved</option>
+              <option value="lost">Lost</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-primary">💾 Save Changes</button>
+          <button type="button" class="btn-ghost" id="cancelEdit">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "name": "librasearch-backend",
+  "version": "1.0.0",
+  "description": "LibraSearch Library Book Search System - Backend",
+  "main": "app.js",
+  "scripts": {
+    "test": "node run-tests.js"
+  },
+  "keywords": ["library", "book", "search"],
+  "author": "",
+  "license": "ISC"
+}

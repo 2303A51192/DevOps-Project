@@ -1,0 +1,66 @@
+name: build
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1. Checkout Code ─────────────────────────────────
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # ── 2. Show repository structure ──────────────────────
+      - name: Show repository structure
+        run: |
+          echo "📁 Repository structure:"
+          find . -not -path './.git/*' | sort | sed 's|[^/]*/|  |g'
+
+      # ── 3. Setup Node ─────────────────────────────────────
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # ── 4. Install Backend Dependencies ───────────────────
+      - name: Install Backend Dependencies
+        working-directory: ./backend
+        run: |
+          echo "📦 Installing backend dependencies..."
+          npm install
+          echo "✅ Backend dependencies installed."
+
+      # ── 5. Run Backend Tests ──────────────────────────────
+      - name: Run Backend Tests
+        working-directory: ./backend
+        run: |
+          echo "🧪 Running LibraSearch validation tests..."
+          npm test
+
+      # ── 6. Install Frontend Dependencies ─────────────────
+      - name: Install Frontend Dependencies
+        working-directory: ./frontend
+        run: |
+          echo "📦 Installing frontend dependencies..."
+          npm install
+          echo "✅ Frontend dependencies installed."
+
+      # ── 7. Build React App ────────────────────────────────
+      - name: Build React App
+        working-directory: ./frontend
+        run: |
+          echo "🏗️  Building LibraSearch frontend..."
+          npm run build
+          echo "✅ Frontend build complete."
+
+      # ── 8. Verify Build Artifacts ─────────────────────────
+      - name: Verify build output
+        run: |
+          echo "📂 Checking build output..."
+          ls -lh frontend/dist/
+          echo "✅ Build artifacts verified."
